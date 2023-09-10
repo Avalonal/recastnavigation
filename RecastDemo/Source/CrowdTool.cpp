@@ -375,7 +375,50 @@ void CrowdToolState::handleRender()
 			}
 			dd.end();
 		}
-		
+
+		if (true)
+		{
+			dd.begin(DU_DRAW_LINES, 3.0f);
+			for (int j = 0; j < ag->boundary.getSegmentCount(); ++j)
+			{
+				const float* s = ag->boundary.getSegment(j);
+				unsigned int col = duRGBA(0, 0, 255, 255);
+				if (dtTriArea2D(pos, s, s + 3) < 0.0f) col = duDarkenCol(col);
+				duAppendArrow(&dd, s[0], s[1] + 0.2f, s[2], s[3], s[4] + 0.2f, s[5], 0.0f, 0.3f, col);
+			}
+			dd.end();
+
+			dtCrowd* crowd = m_sample->getCrowd();
+			if (crowd && crowd->getPathQueue())
+			{
+				const dtNavMeshQuery* navquery = crowd->getPathQueue()->getNavQuery();
+
+				const dtPolyRef* path = ag->corridor.getPath();
+				const int npath = ag->corridor.getPathCount();
+
+				for (int i = 0; i < npath; ++i)
+				{
+					float left[3], right[3];
+					unsigned char toType;
+
+					if (i + 1 < npath)
+					{
+						unsigned char fromType; // fromType is ignored.
+
+						if (!dtStatusFailed(navquery->getPortalPoints(path[i], path[i + 1], left, right, fromType, toType)))
+						{
+							dd.begin(DU_DRAW_LINES, 2.0f);
+							dd.vertex(left[0], left[1] + radius, left[2], duRGBA(255, 0, 0, 255));
+							dd.vertex(right[0], right[1] + radius, right[2], duRGBA(255, 0, 0, 255));
+							dd.end();
+						}
+
+					}
+				}
+			}
+
+		}
+
 		if (m_toolParams.m_showNeis)
 		{
 			duDebugDrawCircle(&dd, pos[0],pos[1]+radius,pos[2], ag->params.collisionQueryRange,
@@ -902,6 +945,8 @@ void CrowdTool::handleMenu()
 		m_mode = TOOLMODE_SELECT;
 	if (imguiCheck("Toggle Polys", m_mode == TOOLMODE_TOGGLE_POLYS))
 		m_mode = TOOLMODE_TOGGLE_POLYS;
+	if (imguiCheck("Create Patrol", m_mode == TOOLMODE_CREATE_PATROL))
+		m_mode = TOOLMODE_CREATE_PATROL;
 	
 	imguiSeparatorLine();
 		
@@ -989,6 +1034,12 @@ void CrowdTool::handleMenu()
 	}
 }
 
+/**
+ * \brief 
+ * \param s 
+ * \param p ÊÀ½ç×ø±ê
+ * \param shift 
+ */
 void CrowdTool::handleClick(const float* s, const float* p, bool shift)
 {
 	if (!m_sample) return;
@@ -1045,6 +1096,10 @@ void CrowdTool::handleClick(const float* s, const float* p, bool shift)
 			}
 		}
 	}
+	else if (m_mode == TOOLMODE_CREATE_PATROL)
+	{
+
+	}
 
 }
 
@@ -1095,6 +1150,10 @@ void CrowdTool::handleRenderOverlay(double* proj, double* model, int* view)
 	else if (m_mode == TOOLMODE_SELECT)
 	{
 		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "LMB: select agent.", imguiRGBA(255,255,255,192));	
+	}
+	else if (m_mode == TOOLMODE_CREATE_PATROL)
+	{
+		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "LMB: set patrol point.", imguiRGBA(255,255,255,192));
 	}
 	ty -= 20;
 	imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "SPACE: Run/Pause simulation.  1: Step simulation.", imguiRGBA(255,255,255,192));	

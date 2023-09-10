@@ -123,6 +123,7 @@ class CrowdTool : public SampleTool
 		TOOLMODE_MOVE_TARGET,
 		TOOLMODE_SELECT,
 		TOOLMODE_TOGGLE_POLYS,
+		TOOLMODE_CREATE_PATROL,
 	};
 	ToolMode m_mode;
 	

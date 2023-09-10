@@ -519,6 +519,10 @@ public:
 	/// @return The navigation mesh the query object is using.
 	const dtNavMesh* getAttachedNavMesh() const { return m_nav; }
 
+	/// Returns portal points between two polygons.
+	dtStatus getPortalPoints(dtPolyRef from, dtPolyRef to, float* left, float* right,
+		unsigned char& fromType, unsigned char& toType) const;
+
 	/// @}
 	
 private:
@@ -530,9 +534,7 @@ private:
 	void queryPolygonsInTile(const dtMeshTile* tile, const float* qmin, const float* qmax,
 							 const dtQueryFilter* filter, dtPolyQuery* query) const;
 
-	/// Returns portal points between two polygons.
-	dtStatus getPortalPoints(dtPolyRef from, dtPolyRef to, float* left, float* right,
-							 unsigned char& fromType, unsigned char& toType) const;
+	
 	dtStatus getPortalPoints(dtPolyRef from, const dtPoly* fromPoly, const dtMeshTile* fromTile,
 							 dtPolyRef to, const dtPoly* toPoly, const dtMeshTile* toTile,
 							 float* left, float* right) const;

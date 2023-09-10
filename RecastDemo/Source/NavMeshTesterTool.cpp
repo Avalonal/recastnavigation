@@ -1293,7 +1293,9 @@ void NavMeshTesterTool::handleRender()
 				float p0[3], p1[3];
 				dd.depthMask(false);
 				getPolyCenter(m_navMesh, m_parent[i], p0);
+				duDebugDrawCross(&dd, p0[0],p0[1],p0[2], 0.5f, duRGBA(0,0,0,128), 2.0f);
 				getPolyCenter(m_navMesh, m_polys[i], p1);
+				duDebugDrawCross(&dd, p1[0],p1[1],p1[2], 0.5f, duRGBA(0,0,0,128), 2.0f);
 				duDebugDrawArc(&dd, p0[0],p0[1],p0[2], p1[0],p1[1],p1[2], 0.25f, 0.0f, 0.4f, duRGBA(0,0,0,128), 2.0f);
 				dd.depthMask(true);
 			}
@@ -1304,7 +1306,7 @@ void NavMeshTesterTool::handleRender()
 			memset(refs, 0, sizeof(dtPolyRef)*MAX_SEGS); 
 			int nsegs = 0;
 			m_navQuery->getPolyWallSegments(m_polys[i], &m_filter, segs, refs, &nsegs, MAX_SEGS);
-			dd.begin(DU_DRAW_LINES, 2.0f);
+			dd.begin(DU_DRAW_LINES, 5.0f);
 			for (int j = 0; j < nsegs; ++j)
 			{
 				const float* s = &segs[j*6];
@@ -1314,7 +1316,7 @@ void NavMeshTesterTool::handleRender()
 				float distSqr = dtDistancePtSegSqr2D(m_spos, s, s+3, tseg);
 				if (distSqr > dtSqr(m_neighbourhoodRadius))
 					continue;
-				
+				  
 				float delta[3], norm[3], p0[3], p1[3];
 				dtVsub(delta, s+3,s);
 				dtVmad(p0, s, delta, 0.5f);

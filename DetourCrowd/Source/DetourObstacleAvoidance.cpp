@@ -419,7 +419,7 @@ float dtObstacleAvoidanceQuery::processSample(const float* vcand, const float cs
 	// Normalize side bias, to prevent it dominating too much.
 	if (nside)
 		side /= nside;
-	
+
 	const float spen = m_params.weightSide * side;
 	const float tpen = m_params.weightToi * (1.0f/(0.1f+tmin*m_invHorizTime));
 	
